@@ -1,0 +1,31 @@
+name: Fetch upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '5 5 * * FRI'  # At 05:05 AM, only on Friday
+
+env:
+  UPSTREAM_REPO: https://github.com/DIYgod/RSSHub.git
+  UPSTREAM_BRANCH: master
+
+jobs:
+  fetch:
+    permissions:
+      contents: write  # for Git to git push
+    name: Auto Fetch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: master
+          fetch-depth: 100
+      - name: Fetch Merge Push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git fetch --depth=100 --no-tags "${{ env.UPSTREAM_REPO }}" "${{ env.UPSTREAM_BRANCH }}:upstream"
+          git merge -m "Merge upstream ${{ env.UPSTREAM_REPO }} ${{ env.UPSTREAM_BRANCH }}" --into master upstream
+          git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master

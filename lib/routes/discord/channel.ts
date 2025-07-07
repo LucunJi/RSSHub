@@ -49,15 +49,24 @@ async function handler(ctx) {
     const guildInfo = await getGuild(guildId, authorization);
     const { name: guildName, icon: guidIcon } = guildInfo;
 
-    const messages = messagesRaw.map((message) => ({
-        title: message.content.split('\n')[0],
-        description: art(path.join(__dirname, 'templates/message.art'), { message, guildInfo }),
-        author: `${message.author.global_name ?? message.author.username}(${message.author.username})`,
-        pubDate: parseDate(message.timestamp),
-        updated: message.edited_timestamp ? parseDate(message.edited_timestamp) : undefined,
-        category: `#${channelName}`,
-        link: `${baseUrl}/channels/${guildId}/${channelId}/${message.id}`,
-    }));
+    const messages = messagesRaw.map((message) => {
+        let title = message.content.split('\n')[0].trim();
+        if (title.length === 0) {
+            title = message.embeds
+                ?.filter((em) => em.title !== undefined && em.title.length > 0)
+                .map((em) => em.title)
+                .join(' / ');
+        }
+        return {
+            title,
+            description: art(path.join(__dirname, 'templates/message.art'), { message, guildInfo }),
+            author: `${message.author.global_name ?? message.author.username}(${message.author.username})`,
+            pubDate: parseDate(message.timestamp),
+            updated: message.edited_timestamp ? parseDate(message.edited_timestamp) : undefined,
+            category: `#${channelName}`,
+            link: `${baseUrl}/channels/${guildId}/${channelId}/${message.id}`,
+        };
+    });
 
     return {
         title: `#${channelName} - ${guildName} - Discord`,

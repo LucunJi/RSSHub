@@ -21,6 +21,8 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: master
+          # use custom PAT to trigger other workflows when pushing, see https://github.com/orgs/community/discussions/37103
+          token: ${{ secrets.FETCH_UPSTREAM_GITHUB_PAT }}
           fetch-depth: 100
       - name: Fetch Merge Push
         run: |
@@ -28,4 +30,4 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git fetch --depth=100 --no-tags "${{ env.UPSTREAM_REPO }}" "${{ env.UPSTREAM_BRANCH }}:upstream"
           git merge -m "Merge upstream ${{ env.UPSTREAM_REPO }} ${{ env.UPSTREAM_BRANCH }}" --into master upstream
-          git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master
+          git push

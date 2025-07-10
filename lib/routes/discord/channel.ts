@@ -156,7 +156,7 @@ async function handler(ctx) {
                         minute: '2-digit',
                     }),
             };
-            const locale = (ctx.req.header('Accepte-Language') as string | undefined)
+            const locale = (ctx.req.header('Accept-Language') as string | undefined)
                 ?.split(',')
                 .filter((seg) => seg.trim().length > 0)
                 .map((seg) => {
@@ -166,7 +166,7 @@ async function handler(ctx) {
                     const [l, q] = seg.split(';', 2);
                     return [l.trim(), Number.parseFloat(q.trim())];
                 })
-                .reduce((prev, curr) => (curr[1] > prev[1] ? curr : prev));
+                .reduce((prev, curr) => (curr[1] > prev[1] ? curr : prev))[0];
             const time = new Date(Number.parseInt(node.timestamp) * 1000);
             return formatters[node.format ?? 'f'](time, locale ?? 'en-us');
         }
@@ -181,7 +181,7 @@ async function handler(ctx) {
                     return this[node.type].call(this, node);
                 } catch (error) {
                     logger.error(`Failed to parse Markdown AST node: ${JSON.stringify(node)}: ${error}`);
-                    return '<p>timestamp paring failure</p>';
+                    return '<p>markdown paring failure</p>';
                 }
             });
 

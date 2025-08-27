@@ -162,14 +162,11 @@ async function handler(ctx) {
             // bilibili的API中返回的视频地址采用http，然而经验证，短视频地址支持https访问，但偶尔会返回超时错误(可能是网络原因)。
             // 因此保险起见加入两个source标签
             // link
-
-            // 尝试使用 opus 避免一些针对 t.bilibili.com 的风控
-            // attempt to avoid rate limit to t.bilibili.com by switching to opus path
             let link = '';
             if (data.dynamic_id) {
-                link = `https://www.bilibili.com/opus/${data.dynamic_id}`;
+                link = `https://t.bilibili.com/${data.dynamic_id}`;
             } else if (item.desc?.dynamic_id) {
-                link = `https://www.bilibili.com/opus/${item.desc.dynamic_id}`;
+                link = `https://t.bilibili.com/${item.desc.dynamic_id}`;
             }
 
             // emoji
